@@ -21,72 +21,67 @@
 </head>
 <body>
   <div id="errorBox"></div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r150/three.min.js"
-          onerror="document.getElementById('errorBox').textContent = 'Failed to load Three.js'; document.getElementById('errorBox').style.display = 'block'; console.error('Three.js failed to load');">
-  </script>
+
+  <!-- Load Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r150/three.min.js"></script>
+
+  <!-- Now that THREE is available, wait for DOM to run app -->
   <script>
-    window.addEventListener('error', function (e) {
-      console.error('Global JS Error:', e.message);
-      const errBox = document.getElementById('errorBox');
-      errBox.textContent = 'JavaScript Error: ' + e.message;
-      errBox.style.display = 'block';
-    });
+    window.addEventListener('load', () => {
+      try {
+        if (!window.THREE) throw new Error("Three.js not loaded");
 
-    try {
-      if (!THREE) {
-        throw new Error("Three.js not loaded");
-      }
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 2;
 
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.z = 2;
-
-      const renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      document.body.appendChild(renderer.domElement);
-
-      const light = new THREE.AmbientLight(0xffffff);
-      scene.add(light);
-
-      const sphereGeometry = new THREE.SphereGeometry(0.9, 64, 64);
-      const textureLoader = new THREE.TextureLoader();
-
-      textureLoader.load(
-        'https://raw.githubusercontent.com/VirtualGlobes/webgl-earth/master/images/earth.jpg',
-        (texture) => {
-          const material = new THREE.MeshStandardMaterial({ map: texture });
-          const earth = new THREE.Mesh(sphereGeometry, material);
-          scene.add(earth);
-
-          function animate() {
-            requestAnimationFrame(animate);
-            earth.rotation.y += 0.001;
-            renderer.render(scene, camera);
-          }
-
-          animate();
-        },
-        undefined,
-        (err) => {
-          console.error('Texture failed to load:', err);
-          const errBox = document.getElementById('errorBox');
-          errBox.textContent = 'Failed to load Earth texture.';
-          errBox.style.display = 'block';
-        }
-      );
-
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-      });
+        document.body.appendChild(renderer.domElement);
 
-    } catch (e) {
-      console.error('Caught error in setup:', e);
-      const errBox = document.getElementById('errorBox');
-      errBox.textContent = 'Setup Error: ' + e.message;
-      errBox.style.display = 'block';
-    }
+        const light = new THREE.AmbientLight(0xffffff);
+        scene.add(light);
+
+        const sphereGeometry = new THREE.SphereGeometry(0.9, 64, 64);
+        const textureLoader = new THREE.TextureLoader();
+
+        textureLoader.load(
+          'https://raw.githubusercontent.com/VirtualGlobes/webgl-earth/master/images/earth.jpg',
+          (texture) => {
+            const material = new THREE.MeshStandardMaterial({ map: texture });
+            const earth = new THREE.Mesh(sphereGeometry, material);
+            scene.add(earth);
+
+            function animate() {
+              requestAnimationFrame(animate);
+              earth.rotation.y += 0.001;
+              renderer.render(scene, camera);
+            }
+
+            animate();
+          },
+          undefined,
+          (err) => {
+            console.error('Texture failed to load:', err);
+            const errBox = document.getElementById('errorBox');
+            errBox.textContent = 'Failed to load Earth texture.';
+            errBox.style.display = 'block';
+          }
+        );
+
+        window.addEventListener('resize', () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+      } catch (e) {
+        console.error('Setup Error:', e);
+        const errBox = document.getElementById('errorBox');
+        errBox.textContent = 'Setup Error: ' + e.message;
+        errBox.style.display = 'block';
+      }
+    });
   </script>
 </body>
 </html>
