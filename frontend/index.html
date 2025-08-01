@@ -1,24 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>CelestialTrack</title>
+  <meta charset="utf-8">
+  <title>CelestialTrack - Cesium Quickstart</title>
 
-  <!-- CesiumJS Library -->
+  <!-- ✅ CesiumJS CDN version (1.131) -->
   <script src="https://cesium.com/downloads/cesiumjs/releases/1.131/Build/Cesium/Cesium.js"></script>
-  <link href="https://cesium.com/downloads/cesiumjs/releases/1.131/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.131/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
 
   <style>
     html, body, #cesiumContainer {
       width: 100%; height: 100%;
       margin: 0; padding: 0;
       overflow: hidden;
+      font-family: sans-serif;
       background: #000;
     }
   </style>
 </head>
 <body>
   <div id="cesiumContainer"></div>
-  <script src="viewer.js"></script>
+
+  <script>
+    // ✅ Your Cesium Ion token (public: assets:read)
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5YzkyNjFlNy1lY2JkLTRlMzMtOTIwNi02OTAxM2NmMWFlMDEiLCJpZCI6MzI3NjAwLCJpYXQiOjE3NTQwMDM5ODV9.eIlC7h0S8AQvHlZK9vd_AvQ_QMuARyFEKbEJRfQn4jk';
+
+    // ✅ Create the globe viewer
+    const viewer = new Cesium.Viewer('cesiumContainer', {
+      terrain: Cesium.createWorldTerrain()
+    });
+
+    // ✅ Move camera to San Francisco
+    viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(-122.4175, 37.655, 400),
+      orientation: {
+        heading: Cesium.Math.toRadians(0),
+        pitch: Cesium.Math.toRadians(-15),
+        roll: 0
+      }
+    });
+
+    // ✅ Add 3D buildings
+    Cesium.createOsmBuildingsAsync().then(function(buildings) {
+      viewer.scene.primitives.add(buildings);
+    });
+  </script>
 </body>
 </html>
