@@ -1,18 +1,31 @@
+Cesium.Ion.defaultAccessToken = 'YOUR_CESIUM_ION_ACCESS_TOKEN';
+
 const viewer = new Cesium.Viewer('cesiumContainer', {
-  terrainProvider: Cesium.createWorldTerrain(),
-  shouldAnimate: true
+  terrain: Cesium.createWorldTerrain(),
+  timeline: false,
+  animation: false
+});
+
+// Optionally fly camera to a default position
+viewer.camera.flyTo({
+  destination: Cesium.Cartesian3.fromDegrees(0, 20, 20000000),
+  orientation: {
+    heading: Cesium.Math.toRadians(0),
+    pitch: Cesium.Math.toRadians(-30),
+    roll: 0
+  }
 });
 
 viewer.screenSpaceEventHandler.setInputAction((click) => {
-  const cartesian = viewer.scene.camera.pickEllipsoid(click.position);
-  if (!cartesian) return;
-  const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
-  const lat = Cesium.Math.toDegrees(cartographic.latitude).toFixed(6);
-  const lon = Cesium.Math.toDegrees(cartographic.longitude).toFixed(6);
+  const ellipsoidPoint = viewer.scene.camera.pickEllipsoid(click.position);
+  if (!ellipsoidPoint) return;
+  const carto = Cesium.Cartographic.fromCartesian(ellipsoidPoint);
+  const lat = Cesium.Math.toDegrees(carto.latitude).toFixed(6);
+  const lon = Cesium.Math.toDegrees(carto.longitude).toFixed(6);
 
   viewer.entities.removeAll();
   viewer.entities.add({
-    position: cartesian,
+    position: ellipsoidPoint,
     point: { pixelSize: 10, color: Cesium.Color.YELLOW },
     label: {
       text: `Lat: ${lat}, Lon: ${lon}`,
